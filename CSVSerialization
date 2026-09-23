@@ -1,0 +1,51 @@
+package com.example.csv;
+import java.io.*;
+import java.util.ArrayList;
+public class CSVSerialization {
+
+	public static void main(String[] args) {
+		String csvFile = "students.csv";
+        String serFile = "students.ser";
+        String outputCsv = "students_output.csv";
+
+        ArrayList<Student> students = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        	String line;
+            while ((line = br.readLine()) != null) {
+            	String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                String name = data[1];
+                int age = Integer.parseInt(data[2]);
+                students.add(new Student(id, name, age));
+            }
+            System.out.println("CSV data read successfully.");
+
+        } catch (IOException e) {
+            System.out.println("Error reading CSV: " + e.getMessage());
+        }
+
+        try (ObjectOutputStream out =
+            new ObjectOutputStream(new FileOutputStream(serFile))) {
+        	out.writeObject(students);
+            System.out.println("Data serialized successfully.");
+
+        } 
+        catch (IOException e) {
+            System.out.println("Serialization error: " + e.getMessage());
+        }
+
+        try (ObjectInputStream in =new ObjectInputStream(new FileInputStream(serFile))) {
+            ArrayList<Student> data =(ArrayList<Student>) in.readObject();
+            System.out.println("\nDeserialized Data:");
+            for (Student s : data) {
+                System.out.println(s);
+            }
+
+        }
+        catch (IOException | ClassNotFoundException e) {
+            System.out.println("Deserialization error: " + e.getMessage());
+        }
+	}
+
+}
